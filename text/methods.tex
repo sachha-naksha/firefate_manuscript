@@ -9,15 +9,13 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
 
-% Placeholder for math that was lost when the Word text was pasted in.
-% Fill each of these in from the original .docx.
 \newcommand{\MISSING}{\textbf{[MATH MISSING]}}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.8em}
 \onehalfspacing
 
-\title{FIREFate --- Methods}
+\title{FIREFate Methods}
 \date{}
 
 \begin{document}
@@ -39,6 +37,7 @@ that bias cell-fate decisions using an interpretable machine learning model appl
 TF-KO versus unperturbed control cell populations; and (7) determining TFs enriched
 within these predisposing programs through integration of static and dynamic GRNs.
 We implemented and tested FIREFate in Python and R (versions xx and xx) and designed
+% TODO: fill in Python / R version numbers.
 it for use in Jupyter Notebook and RStudio environments. FIREFate code is open source
 and available on GitHub (\url{https://github.com/sachha-naksha/FIREFate.git}), along
 with detailed descriptions of functions and tutorials. Additionally, we provide a
@@ -58,41 +57,43 @@ linear and nonlinear relationships between observed data ($X$) and the phenotype
 interest ($Y$: in our case binary values regarding each state of interest):
 
 \begin{equation}
-\MISSING
+X' = AZ + E
 \end{equation}
 
-\MISSING{} is sc-RNA-seq expression data with \MISSING{} cells and \MISSING{} genes.
-\MISSING{} is decomposed into two factors: \MISSING{} and \MISSING{}, with an error term
-\MISSING{}. \MISSING{} is the allocation matrix and represents the membership of each
-feature to a cellular program. \MISSING{} is the CP matrix and represents a
-lower-dimensional representation (\MISSING) of the input data in latent space. Then
-using a regression model which applied on CPs, the linear part of the model is generated
+$X_{n \times p}$ is scRNA-seq expression data with $n$ cells and $p$ genes.
+$X_{n \times p}$ is decomposed into two factors, $A_{p \times K}$ and $Z_{K \times n}$,
+with an error term $E$. $A$ is the allocation matrix and represents the membership of
+each feature to a cellular program. $Z$ is the CP matrix and represents a
+lower-dimensional representation ($K < p$) of the input data in latent space. Then,
+using a regression model applied on CPs, the linear part of the model is generated,
 which represents the significant standalone CPs:
 
 \begin{equation}
-\MISSING
+LP = \sum_{j \in S_{1}} \beta_{j} Z_{j} + \epsilon_{1}
 \end{equation}
 
-Here \MISSING{} is the linear part of the model, and \MISSING{} is the set of
-significant standalone CPs. Then incorporating the nonlinear relationships, the method
+Here $LP$ is the linear part of the model, and $S_{1}$ is the set of significant
+standalone CPs. Then, incorporating the nonlinear relationships, the method
 identifies significant interacting CPs:
 
 \begin{equation}
-\MISSING
-\qquad \text{where} \qquad \MISSING
+NP_{j} = \beta_{j} Z_{j} + \sum_{i} C_{ij}\, Z_{i} \odot Z_{j} + \epsilon_{2}
+\qquad \text{where } i \neq j,\; j \in S_{1},\; i \in \{1 \dots K\},\;
+\text{and } Z_{i} \odot Z_{j} \in S_{2}
 \end{equation}
 
-Here \MISSING{} and \MISSING{} is the effect size of the interaction term between the
-two CPs \MISSING{} and \MISSING{}. \MISSING{} is the set of putative interactions
-involving the standalone significant CPs. These interactions arise from the model's
-non-linear
-architecture, capturing combinatorial regulation and helping improve interpretability
-and predictive performance.
+Here $\beta \in \mathbb{R}^{1 \times K}$ and $C_{ij}$ is the effect size of the
+interaction term between the two CPs $Z_{i}$ and $Z_{j}$. $S_{2}$ is the set of putative
+interactions involving the standalone significant CPs. These interactions arise from the
+model's non-linear architecture, capturing combinatorial regulation and helping improve
+interpretability and predictive performance.
 
 Before applying SLIDE, the single-cell RNA sequencing (scRNA-seq) data were
 preprocessed using the filtering and preprocessing functions provided in the SLIDE
 library (\url{https://github.com/jishnu-lab/SLIDE}) and FIREFate GitHub repository
 (\url{https://github.com/jishnu-lab/xxxx}), following standard best practices. First,
+% TODO: replace jishnu-lab/xxxx with the final FIREFate repo URL (currently
+% https://github.com/sachha-naksha/FIREFate) -- these two URLs disagree in the draft.
 genes with zero unique molecular identifier (UMI) counts across all cells were removed,
 and mitochondrial and ribosomal genes were excluded from further analysis. Second,
 sparsity filtering was performed using the \texttt{zeroFiltering} function in the SLIDE
@@ -105,6 +106,7 @@ B cell system, the method was applied to PB and GC B cells using both scMultiome
 (Day 6) and scRNA-seq data. For the T cell system, the model was applied to Tex-term
 and Tex-KLR cells. A summary of the training conditions---including experimental groups,
 collection time points, and model parameters---is provided in Supplementary Table 1.
+% TODO (highlighted in draft): confirm Supplementary Table 1 exists / renumber.
 
 We also used this approach to get the predisposing cellular programs from single-cell
 Perturb-seq data collected on Day 6 following transcription factor (TF) KOs. The
@@ -114,6 +116,7 @@ For T cell system we applied the same approach on single-cell Perturb-seq data o
 and Ets1 KO cells against unperturbed control cells. A summary of the training
 conditions---including experimental groups, and model parameters---is provided in
 Supplementary Table 2.
+% TODO (highlighted in draft): confirm Supplementary Table 2 exists / renumber.
 
 \subsection*{Interpreting the cellular programs using LLM-based gene set enrichment analysis}
 
@@ -121,6 +124,7 @@ To derive biologically meaningful modules and corresponding labels for each CP, 
 employed a large language model (LLM)-based gene set enrichment approach on the
 top-ranked genes within each CP. GSAI grouped genes into functional programs and
 generated module annotations. Using the prompt provided in Supplementary File S1, we
+% TODO (highlighted in draft): attach Supplementary File S1 (GSAI prompt).
 supplied the sets of top-ranked genes and asked ChatGPT 5.1 to annotate them with the
 most relevant biological processes.
 
@@ -157,7 +161,14 @@ many genes each TF regulates strongly within the regulons compared to its global
 regulatory profile in the fusion GRNs. For each TF, the enrichment score was computed as:
 
 \begin{equation}
-\MISSING
+\text{Enrichment Score} \;=\;
+\frac{
+  \dfrac{\text{Number of \textbf{strong} TF} \rightarrow \text{gene edges within the regulon}}
+        {\text{Total number of genes in the regulon}}
+}{
+  \dfrac{\text{Number of \textbf{strong} TF} \rightarrow \text{gene edges in the fusion GRNs}}
+        {\text{Total number of genes in the GRN}}
+}
 \end{equation}
 
 The enrichment score thus quantifies the TF's overrepresented strong regulatory influence
@@ -176,8 +187,24 @@ of co-regulated genes within the regulon was then compared to the expected overl
 on the global GRN.
 
 \begin{equation}
-\MISSING
+\text{Enrichment Score}_{\text{order-1}} \;=\;
+\frac{E^{\text{strong}}_{\text{reg}} / G_{\text{reg}}}
+     {E^{\text{strong}}_{\text{GRN}} / G_{\text{GRN}}}
 \end{equation}
+
+\begin{equation}
+\text{Enrichment Score}_{\text{order-2}} \;=\;
+\frac{P_{\text{reg}} / G_{\text{reg}}}
+     {P_{\text{GRN}} / G_{\text{GRN}}}
+\end{equation}
+
+where $E^{\text{strong}}_{\text{reg}}$ and $E^{\text{strong}}_{\text{GRN}}$ are the
+numbers of strong TF$\rightarrow$gene edges within the regulon and within the fusion
+GRN respectively; $P_{\text{reg}}$ and $P_{\text{GRN}}$ are the numbers of genes
+co-regulated by a TF pair with at least one strong edge (i.e. (strong, strong),
+(strong, weak) or (weak, strong); weak--weak pairs excluded) within the regulon and
+within the fusion GRN respectively; and $G_{\text{reg}}$ and $G_{\text{GRN}}$ are the
+total numbers of genes in the regulon and in the GRN.
 
 To reduce spurious associations, we applied two filtering criteria:
 (1) TF pairs must co-regulate more than one gene within the regulon, and (2) TF pairs
@@ -194,8 +221,8 @@ distinguishing GC and PB states in the B-cell system (Supplementary Fig.~1), and
 and Tex-KLR states in the T-cell system (Supplementary Fig.~2). Our workflow proceeded as
 follows: SCENIC+ was first applied to single-cell multi-omic data of both systems to
 infer regulons differentially active between the specified cell states. Regulon activity
-and specificity were quantified using the eRegulon score. To ensure comparability across
-analyses, we retained only those SCENIC+-derived regulons whose TFs overlapped with
+and specificity were quantified using the \textit{eRegulon} score. To ensure comparability
+across analyses, we retained only those SCENIC+-derived regulons whose TFs overlapped with
 significantly enriched order-1 TFs identified through our regulon and fusion GRN
 analyses. To compare the specificity and sensitivity of those TF-centric regulons, we
 compiled the target genes of each transcription factor within the selected SCENIC+
@@ -238,17 +265,34 @@ transitions, and gene expression changes along pseudotime branches.
 \subsection*{Defining dynamic TF force on a target gene}
 
 % TODO: section not yet written.
+% Placeholder note from the draft: "SDE adaptation to include atac+rna / only-rna with
+% base GRN + equation derived empirically."
+%
+% Suggested scaffold matching the implementation (signed force = sign of the fitted
+% coefficient x its magnitude x the TF's expression at that point in pseudotime).
+% Uncomment and adapt once the SDE formulation is finalised:
+%
+% For a transcription factor $f$ acting on target gene $g$ at pseudotime $t$, we define
+% the dynamic TF force as
+% \begin{equation}
+% F_{f \rightarrow g}(t) \;=\; \operatorname{sign}\!\big(\beta_{f \rightarrow g}(t)\big)
+% \cdot \big|\beta_{f \rightarrow g}(t)\big| \cdot x_{f}(t),
+% \end{equation}
+% where $\beta_{f \rightarrow g}(t)$ is the regulatory coefficient of the edge
+% $f \rightarrow g$ in the episodic GRN local to pseudotime $t$, and $x_{f}(t)$ is the
+% (smoothed) expression of $f$ at $t$. Positive and negative values of
+% $F_{f \rightarrow g}(t)$ correspond to activating and repressive force respectively.
+
 SDE adaptation to include atac+rna / only-rna with base GRN + equation derived
 empirically.
 
 \subsection*{Construction of gene regulatory networks across episodes of state transition trajectories}
 
 % TODO: section not yet written.
-Llllll
 
 \subsection*{Enriching for dynamic TF activity in episodic GRNs}
 
-% TODO: section incomplete.
+% TODO: section incomplete -- sentence below is truncated in the draft.
 The trajectory branches for both the datasets were broken into episodes of invariant TF
 activity. T cells have a linear
 
@@ -315,10 +359,10 @@ labels (GC and PB cells from the single-cell multiome dataset). Two scenarios we
 defined: first, if a predicted fate could not be distinguished from the true identity
 based on transcriptional features, the cell was assigned to the same identity.
 Conversely, if the predicted fate could be confidently discriminated from the true
-identity, we inferred that FIREFate did not specify the cell as belonging to the
+identity, we inferred that \textbf{FIREFate} did not specify the cell as belonging to the
 predicted fate. This framework produced classification loss scores that quantified the
-predictive confidence of rollback analysis, thereby enabling evaluation of the model's
-performance in capturing early fate bias.
+predictive confidence of \textbf{rollback analysis}, thereby enabling evaluation of the
+model's performance in capturing early fate bias.
 
 \subsection*{Gene set enrichment analysis using ESCAPE}
 
